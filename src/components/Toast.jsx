@@ -13,12 +13,12 @@ const ICONS = {
 }
 
 const COLORS = {
-  success: 'bg-zinc-900 border-zinc-700 text-white',
-  error: 'bg-zinc-900 border-red-500 text-red-300',
-  info: 'bg-zinc-900 border-zinc-700 text-zinc-200',
-  warning: 'bg-zinc-900 border-amber-500 text-amber-300',
-  connected: 'bg-zinc-900 border-emerald-500 text-emerald-300',
-  disconnected: 'bg-zinc-900 border-red-500 text-red-300',
+  success: 'bg-wa-panel border-wa-online/40 text-wa-online',
+  error: 'bg-wa-panel border-wa-danger/50 text-wa-danger',
+  info: 'bg-wa-panel border-wa-accent/40 text-wa-text',
+  warning: 'bg-wa-panel border-wa-warning/50 text-wa-warning',
+  connected: 'bg-wa-panel border-wa-online/40 text-wa-online',
+  disconnected: 'bg-wa-panel border-wa-danger/50 text-wa-danger',
 }
 
 export function ToastProvider({ children }) {

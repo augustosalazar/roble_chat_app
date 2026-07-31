@@ -51,8 +51,8 @@ export default function LoginForm() {
       </div>
 
       {error && (
-        <div className="bg-red-950/60 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center text-xs font-bold flex-shrink-0">!</span>
+        <div className="bg-wa-danger/10 border border-wa-danger/30 text-wa-danger px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+          <span className="w-5 h-5 rounded-full bg-wa-danger/20 flex items-center justify-center text-xs font-bold flex-shrink-0">!</span>
           {error}
         </div>
       )}

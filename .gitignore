@@ -30,3 +30,6 @@ logs/
 
 # Artifacts de la demo
 roble-db.zip
+
+# Local Claude Code settings
+.claude/settings.local.json

@@ -1,19 +1,63 @@
 @import "tailwindcss";
 
 @theme {
-  --color-wa-bg: #0b141a;
-  --color-wa-sidebar: #111b21;
-  --color-wa-panel: #202c33;
-  --color-wa-active: #2a3942;
-  --color-wa-hover: #202c33;
-  --color-wa-bubble: #005c4b;
-  --color-wa-bubble-hover: #0a6b5d;
-  --color-wa-accent: #00a884;
-  --color-wa-accent-dark: #008069;
-  --color-wa-text: #e9edef;
-  --color-wa-muted: #8696a0;
-  --color-wa-border: #222d34;
-  --color-wa-danger: #f15c6d;
+  /* Cool slate-navy base + a single blue accent (Telegram / iMessage register,
+     deliberately NOT WhatsApp teal). Own message bubbles are the accent blue. */
+  --color-wa-bg: #0a0f1a;
+  --color-wa-sidebar: #0e1523;
+  --color-wa-panel: #172033;
+  --color-wa-active: #243350;
+  --color-wa-hover: #141d30;
+  --color-wa-bubble: #2f6bff;
+  --color-wa-bubble-hover: #3f78ff;
+  --color-wa-accent: #2f6bff;
+  --color-wa-accent-dark: #1e56e6;
+  --color-wa-text: #eef2f9;
+  --color-wa-muted: #8595ad;
+  --color-wa-border: #202b41;
+  --color-wa-danger: #f1556c;
+  --color-wa-warning: #fbbf24;
+  /* Presence is real semantic state, so it keeps its own green. */
+  --color-wa-online: #26d07c;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+/* Non-color helpers + native-widget hint. Dark is the default. */
+:root {
+  color-scheme: dark;
+  --wa-dot: rgba(255, 255, 255, 0.025);
+  --wa-scroll: #2a3942;
+  --wa-scroll-hover: #3b4a54;
+}
+
+/* Light theme: follows the browser / OS preference. Overrides the @theme
+   tokens (same specificity, later in source order) so every wa-* utility
+   flips automatically. The blue accent stays constant across both modes. */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --color-wa-bg: #eef1f6;
+    --color-wa-sidebar: #ffffff;
+    --color-wa-panel: #ffffff;
+    --color-wa-active: #e6ebf5;
+    --color-wa-hover: #f1f4f9;
+    --color-wa-bubble: #2f6bff;
+    --color-wa-bubble-hover: #1e56e6;
+    --color-wa-accent: #2f6bff;
+    --color-wa-accent-dark: #1e56e6;
+    --color-wa-text: #101828;
+    --color-wa-muted: #5b6b85;
+    --color-wa-border: #e1e6ef;
+    --color-wa-danger: #dc3049;
+    --color-wa-warning: #b45309;
+    --color-wa-online: #12a150;
+
+    --wa-dot: rgba(16, 24, 40, 0.05);
+    --wa-scroll: #c5cddb;
+    --wa-scroll-hover: #aab6c9;
+  }
 }
 
 @keyframes slide-in {
@@ -46,23 +90,28 @@
 body {
   background-color: var(--color-wa-bg);
   color: var(--color-wa-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.006em;
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a3942; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #3b4a54; }
+::-webkit-scrollbar-thumb { background: var(--wa-scroll); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--wa-scroll-hover); }
 
 .wa-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
 .wa-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.wa-scrollbar::-webkit-scrollbar-thumb { background: #2a3942; border-radius: 3px; }
-.wa-scrollbar::-webkit-scrollbar-thumb:hover { background: #3b4a54; }
+.wa-scrollbar::-webkit-scrollbar-thumb { background: var(--wa-scroll); border-radius: 3px; }
+.wa-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--wa-scroll-hover); }
 
 .chat-wallpaper {
   background-color: var(--color-wa-bg);
   background-image:
-    radial-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    radial-gradient(circle at 20% 15%, rgba(0, 168, 132, 0.05), transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(0, 128, 105, 0.06), transparent 50%);
+    radial-gradient(var(--wa-dot) 1px, transparent 1px),
+    radial-gradient(circle at 18% 12%, rgba(47, 107, 255, 0.055), transparent 46%),
+    radial-gradient(circle at 88% 84%, rgba(47, 107, 255, 0.04), transparent 52%);
   background-size: 22px 22px, 100% 100%, 100% 100%;
 }

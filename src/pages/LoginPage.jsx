@@ -9,8 +9,8 @@ const features = [
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0b141a] via-[#111b21] to-black flex">
-      <div className="hidden lg:flex flex-1 flex-col justify-center px-16 text-white">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-wa-bg via-wa-sidebar to-wa-bg flex">
+      <div className="hidden lg:flex flex-1 flex-col justify-center px-16 text-wa-text">
         <div className="max-w-lg">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-2xl bg-wa-accent/15 border border-wa-accent/25 flex items-center justify-center">
@@ -21,13 +21,13 @@ export default function LoginPage() {
               <p className="text-wa-muted text-sm">Roble Platform Demo</p>
             </div>
           </div>
-          <p className="text-lg text-zinc-300 leading-relaxed mb-8">
+          <p className="text-lg text-wa-text leading-relaxed mb-8">
             Aplicación demo del servicio de base de datos en tiempo real de Roble,
             con chat general, mensajes directos, usuarios simulados y sincronización vía WebSocket.
           </p>
           <div className="space-y-3">
             {features.map((f, i) => (
-              <div key={i} className="flex items-center gap-3 text-zinc-300">
+              <div key={i} className="flex items-center gap-3 text-wa-muted">
                 <div className="bg-wa-panel p-2 rounded-lg border border-wa-border">
                   <f.icon size={18} className="text-wa-accent" />
                 </div>
@@ -47,7 +47,7 @@ export default function LoginPage() {
 
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
-          <div className="bg-wa-sidebar rounded-3xl shadow-2xl p-8 ring-1 ring-wa-border">
+          <div className="bg-wa-sidebar rounded-3xl shadow-2xl p-8 ring-1 ring-wa-border animate-fade-in-up">
             <div className="lg:hidden flex items-center gap-3 mb-6 pb-6 border-b border-wa-border">
               <div className="w-11 h-11 rounded-xl bg-wa-accent/15 flex items-center justify-center">
                 <MessageSquare size={22} className="text-wa-accent" />

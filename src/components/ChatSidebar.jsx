@@ -121,13 +121,13 @@ export default function ChatSidebar({
                     </div>
                     <span
                       className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ring-[3px] ring-wa-sidebar ${
-                        isOnline ? 'bg-wa-accent' : 'bg-wa-muted'
+                        isOnline ? 'bg-wa-online' : 'bg-wa-muted'
                       }`}
                     />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[15px] text-wa-text truncate">{user.name}</p>
-                    <p className={`text-[12px] truncate ${isOnline ? 'text-wa-accent' : 'text-wa-muted'}`}>
+                    <p className={`text-[12px] truncate ${isOnline ? 'text-wa-online' : 'text-wa-muted'}`}>
                       {isOnline ? 'En línea' : 'Desconectado'}
                     </p>
                   </div>
