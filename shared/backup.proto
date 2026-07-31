@@ -1,0 +1,139 @@
+syntax = "proto3";
+package roble;
+
+message Value {
+  string string_val = 1;
+  int64 int_val = 2;
+  double double_val = 3;
+  bool bool_val = 4;
+  bool is_null = 5;
+  string json_val = 6;
+}
+
+message ColumnDef {
+  string name = 1;
+  string type = 2;
+  string format = 3;
+  bool is_nullable = 4;
+  bool is_primary = 5;
+}
+
+message Row {
+  map<string, Value> cells = 1;
+}
+
+message UserTable {
+  string name = 1;
+  repeated ColumnDef columns = 2;
+  int64 row_count = 3;
+  repeated Row rows = 4;
+}
+
+message Collaborator {
+  string email = 1;
+  string user_id = 2;
+  string role = 3;
+  string status = 4;
+  string invited_by_email = 5;
+}
+
+message ProjectConfig {
+  string app_name = 1;
+  string app_id = 2;
+  string owner_email = 3;
+  string default_role_name = 4;
+  repeated Collaborator collaborators = 5;
+}
+
+message AuthUser {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  optional string password = 4;
+  bool is_verified = 5;
+  optional string verification_code = 6;
+  optional string verification_code_expires_at = 7;
+  optional string avatar_url = 8;
+  optional string phone_number = 9;
+  optional string birth_date = 10;
+  optional string gender = 11;
+  optional string country = 12;
+  optional string city = 13;
+  optional string address = 14;
+  bool is_sso = 15;
+  optional string last_login = 16;
+  string created_at = 17;
+  string updated_at = 18;
+  optional string role_id = 19;
+}
+
+message AuthSession {
+  string id = 1;
+  string user_id = 2;
+  string refresh_token = 3;
+  string created_at = 4;
+  string expires_at = 5;
+  optional string device_info = 6;
+}
+
+message UserIdentity {
+  string id = 1;
+  string user_id = 2;
+  string provider = 3;
+  string provider_user_id = 4;
+  string created_at = 5;
+}
+
+message Role {
+  string id = 1;
+  string name = 2;
+}
+
+message Permission {
+  string id = 1;
+  string resource = 2;
+  string action = 3;
+  optional string scope = 4;
+  optional string description = 5;
+}
+
+message RolePermission {
+  string role_id = 1;
+  string permission_id = 2;
+}
+
+message SingleSettings {
+  string id = 1;
+  string default_role_name = 2;
+  string created_at = 3;
+  string updated_at = 4;
+}
+
+message SystemUser {
+  string id = 1;
+  string user_id = 2;
+  string email = 3;
+  string name = 4;
+  optional string extra = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message AuthData {
+  repeated AuthUser users = 1;
+  repeated AuthSession sessions = 2;
+  repeated UserIdentity identities = 3;
+  repeated Role roles = 4;
+  repeated Permission permissions = 5;
+  repeated RolePermission role_permissions = 6;
+  SingleSettings settings = 7;
+  repeated SystemUser system_users = 8;
+}
+
+message FullBackup {
+  string schema_version = 1;
+  string exported_at = 2;
+  ProjectConfig config = 3;
+  AuthData auth = 4;
+  repeated UserTable tables = 5;
+}

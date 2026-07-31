@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Variables de entorno (guardar .env_sample como plantilla)
+.env
+.env.local
+.env.production
+.env.development
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Artifacts de la demo
+roble-db.zip
