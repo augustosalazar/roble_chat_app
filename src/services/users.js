@@ -2,8 +2,9 @@ import { colorFromId } from '../utils'
 
 const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID
 const VITE_ID_CONSULTA_LISTA_USUARIOS = import.meta.env.VITE_ID_CONSULTA_LISTA_USUARIOS
+const VITE_BASE_HOST = (import.meta.env.VITE_BASE_HOST || 'http://localhost').replace(/\/$/, '')
 
-const DB_URL = `/database/${VITE_PROJECT_ID}`
+const DB_URL = `${VITE_BASE_HOST}/database/${VITE_PROJECT_ID}`
 
 export async function getSystemUsers() {
   if (!VITE_ID_CONSULTA_LISTA_USUARIOS) {
@@ -18,7 +19,7 @@ export async function getSystemUsers() {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ id: VITE_ID_CONSULTA_LISTA_USUARIOS, params: [] }),
+      body: JSON.stringify({ id: VITE_ID_CONSULTA_LISTA_USUARIOS }),
   })
 
   if (res.status === 401) {
@@ -30,7 +31,7 @@ export async function getSystemUsers() {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: VITE_ID_CONSULTA_LISTA_USUARIOS, params: [] }),
+    body: JSON.stringify({ id: VITE_ID_CONSULTA_LISTA_USUARIOS }),
     })
   }
 
@@ -69,7 +70,7 @@ async function refreshAccessToken() {
   const refreshToken = localStorage.getItem('refreshToken')
   if (!refreshToken) return false
   try {
-    const res = await fetch(`/auth/${VITE_PROJECT_ID}/refresh-token`, {
+    const res = await fetch(`${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}/refresh-token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),

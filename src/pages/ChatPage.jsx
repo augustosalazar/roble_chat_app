@@ -12,6 +12,8 @@ import { io } from 'socket.io-client'
 import { useToast } from '../components/Toast'
 
 const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID
+const VITE_BASE_HOST = (import.meta.env.VITE_BASE_HOST || 'http://localhost').replace(/\/$/, '')
+const VITE_REALTIME_HOST = (import.meta.env.VITE_REALTIME_HOST || `${VITE_BASE_HOST}:3003`).replace(/\/$/, '')
 
 function decodeJwt(token) {
   try {
@@ -202,7 +204,8 @@ export default function ChatPage() {
       }
     }
 
-    const socket = io(`${window.location.origin}/realtime`, {
+    const wsUrl = VITE_REALTIME_HOST.replace(/^http/, 'ws')
+    const socket = io(`${wsUrl}/realtime`, {
       transports: ['websocket'],
       query: { token, dbName: VITE_PROJECT_ID },
     })

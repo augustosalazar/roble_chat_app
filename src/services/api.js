@@ -1,8 +1,9 @@
 import axios from "axios";
 
 const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID
+const VITE_BASE_HOST = (import.meta.env.VITE_BASE_HOST || 'http://localhost').replace(/\/$/, '')
 
-export const AUTH_URL = `/auth/${VITE_PROJECT_ID}`
+export const AUTH_URL = `${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}`
 
 export function clearSession() {
   localStorage.removeItem("accessToken")

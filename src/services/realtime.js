@@ -1,6 +1,8 @@
 const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID
+const VITE_BASE_HOST = (import.meta.env.VITE_BASE_HOST || 'http://localhost').replace(/\/$/, '')
+const VITE_REALTIME_HOST = (import.meta.env.VITE_REALTIME_HOST || `${VITE_BASE_HOST}:3003`).replace(/\/$/, '')
 
-const REALTIME_REST = `/realtime/data/${VITE_PROJECT_ID}`
+const REALTIME_REST = `${VITE_REALTIME_HOST}/realtime/data/${VITE_PROJECT_ID}`
 
 export const GENERAL_CHAT_ID = 'general'
 
@@ -42,7 +44,7 @@ async function refreshAccessToken() {
   const refreshToken = localStorage.getItem("refreshToken")
   if (!refreshToken) return false
   try {
-    const res = await fetch(`/auth/${VITE_PROJECT_ID}/refresh-token`, {
+    const res = await fetch(`${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}/refresh-token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),

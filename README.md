@@ -34,10 +34,9 @@ cp .env_sample .env
 
 | Variable | Descripción |
 |---|---|
-| `VITE_BASE_HOST` | Host del servicio de autenticación de Roble. |
+| `VITE_BASE_HOST` | Host del servicio de autenticación y de base de datos (execute-query) de Roble. |
 | `VITE_PROJECT_ID` | ID del contrato (project) en Roble. |
-| `VITE_REALTIME_HOST` | Host del servicio de tiempo real de Roble. |
-| `VITE_DB_SERVICE_HOST` | Host del servicio de base de datos de Roble (execute-query). |
+| `VITE_REALTIME_HOST` | Host del servicio de tiempo real de Roble. Solo lo usan las capas de proxy (dev y Docker), no el frontend. |
 | `VITE_ID_CONSULTA_LISTA_USUARIOS` | ID de la consulta que trae la lista de usuarios del sistema. |
 
 ## Instalación y desarrollo
@@ -60,14 +59,14 @@ En desarrollo, el frontend usa **rutas relativas** y el servidor de Vite hace de
 | Ruta | Destino |
 |---|---|
 | `/auth/*` | `VITE_BASE_HOST` |
-| `/database/*` | `VITE_DB_SERVICE_HOST` |
+| `/database/*` | `VITE_BASE_HOST` |
 | `/realtime/*` | `VITE_REALTIME_HOST` |
 | `/socket.io/*` | `VITE_REALTIME_HOST` (con soporte WebSocket) |
 
 ## Endpoints que consume
 
 - Autenticación: `{VITE_BASE_HOST}/auth/{contractId}/login`, `/register`, `/refresh-token`
-- Base de datos: `{VITE_DB_SERVICE_HOST}/database/{contractId}/execute-query`
+- Base de datos: `{VITE_BASE_HOST}/database/{contractId}/execute-query`
 - Realtime (REST): `{VITE_REALTIME_HOST}/realtime/data/{contractId}/messages/{chatId}`
 - Realtime (WebSocket): namespace `/realtime` sobre el engine de Socket.IO en `/socket.io`
 
@@ -80,18 +79,17 @@ npm run preview
 
 ### Despliegue con Docker
 
+> Nota: `VITE_REALTIME_HOST` no se usa en el build del frontend. Solo se pasa en el `docker run` como variable de entorno para que nginx (proxy) reenvíe el WebSocket del realtime.
+
 ```bash
 docker build -t roble-chat-demo \
   --build-arg VITE_BASE_HOST=https://roble-api.test-openlab.uninorte.edu.co \
   --build-arg VITE_PROJECT_ID=tu_contrato_id \
-  --build-arg VITE_REALTIME_HOST=https://roble-realtime.test-openlab.uninorte.edu.co \
-  --build-arg VITE_DB_SERVICE_HOST=https://roble-api.test-openlab.uninorte.edu.co \
   --build-arg VITE_ID_CONSULTA_LISTA_USUARIOS=tu_consulta_id \
   .
 
 docker run -p 8080:80 \
   -e VITE_BASE_HOST=https://roble-api.test-openlab.uninorte.edu.co \
-  -e VITE_DB_SERVICE_HOST=https://roble-api.test-openlab.uninorte.edu.co \
   -e VITE_REALTIME_HOST=https://roble-realtime.test-openlab.uninorte.edu.co \
   roble-chat-demo
 ```
