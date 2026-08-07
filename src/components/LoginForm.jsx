@@ -3,7 +3,6 @@ import { login } from '../services/auth'
 import { useNavigate, Link } from 'react-router-dom'
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { colorFromId } from '../utils'
-import { ensureDefaultUser } from '../services/users'
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')
@@ -28,7 +27,6 @@ export default function LoginForm() {
       localStorage.setItem('userId', userId)
       localStorage.setItem('userName', user.name || user.email || email)
       localStorage.setItem('userColor', colorFromId(userId))
-      ensureDefaultUser()
       navigate('/chat')
     } catch (err) {
       setError(err.response?.data?.message || 'Credenciales inválidas')

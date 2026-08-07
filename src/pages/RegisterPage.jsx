@@ -33,10 +33,6 @@ export default function RegisterPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="bg-wa-active w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 text-wa-accent">3</span>
-                <span>Crea usuarios simulados y cambia entre ellos desde la barra lateral</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="bg-wa-active w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 text-wa-accent">4</span>
                 <span>Los mensajes se sincronizan vía WebSocket con todos los clientes</span>
               </li>
             </ol>

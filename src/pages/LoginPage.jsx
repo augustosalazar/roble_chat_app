@@ -23,7 +23,7 @@ export default function LoginPage() {
           </div>
           <p className="text-lg text-wa-text leading-relaxed mb-8">
             Aplicación demo del servicio de base de datos en tiempo real de Roble,
-            con chat general, mensajes directos, usuarios simulados y sincronización vía WebSocket.
+            con chat general, mensajes directos entre usuarios y sincronización vía WebSocket.
           </p>
           <div className="space-y-3">
             {features.map((f, i) => (

@@ -1,39 +1,42 @@
 import { useState } from 'react'
-import { Plus, Users, MessageSquare, Check, X, Search, Home, LogOut } from 'lucide-react'
+import { Users, MessageSquare, X, Search, Home, LogOut } from 'lucide-react'
+
+function formatListTime(ts) {
+  if (!ts) return ''
+  const d = new Date(ts)
+  const now = new Date()
+  if (d.toDateString() === now.toDateString()) {
+    return d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })
+  }
+  const yest = new Date(now)
+  yest.setDate(now.getDate() - 1)
+  if (d.toDateString() === yest.toDateString()) return 'Ayer'
+  return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
+}
 
 export default function ChatSidebar({
   systemUsers,
-  onlineUserIds,
   activeChatId,
+  activeUserId,
   onOpenGeneral,
   onOpenPrivateChat,
-  users,
-  activeUserId,
-  onSwitchUser,
-  onAddUser,
-  onRemoveUser,
   onLogout,
   participants,
+  unreadMap,
+  lastMsgMap,
+  activeUser,
   open,
   onClose,
 }) {
   const [query, setQuery] = useState('')
-  const [newUserName, setNewUserName] = useState('')
-  const [addingUser, setAddingUser] = useState(false)
 
   const isGeneral = activeChatId === 'general'
+  const generalUnread = unreadMap?.['general'] || 0
 
   const filteredUsers = systemUsers.filter(u =>
+    String(u.userId) !== String(activeUser?.id) &&
     u.name.toLowerCase().includes(query.toLowerCase())
   )
-
-  const handleAddUser = () => {
-    const name = newUserName.trim()
-    if (!name) return
-    onAddUser(name)
-    setNewUserName('')
-    setAddingUser(false)
-  }
 
   const dmId = (otherId) => `dm_${[activeUserId, otherId].sort().join('_')}`
 
@@ -86,6 +89,11 @@ export default function ChatSidebar({
                 : 'Todos los usuarios'}
             </p>
           </div>
+          {generalUnread > 0 && (
+            <span className="bg-wa-accent text-white text-[11px] font-semibold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center flex-shrink-0">
+              {generalUnread}
+            </span>
+          )}
         </button>
 
         <div className="flex items-center gap-2 px-3 pt-3 pb-2">
@@ -97,13 +105,19 @@ export default function ChatSidebar({
 
         {filteredUsers.length === 0 ? (
           <p className="px-4 py-6 text-xs text-wa-muted text-center">
-            {query ? 'Sin resultados' : 'No hay usuarios del sistema disponibles.'}
+            {query ? 'Sin resultados' : 'No hay otros usuarios disponibles.'}
           </p>
         ) : (
           <div className="space-y-0.5">
             {filteredUsers.map((user) => {
-              const isOnline = onlineUserIds.includes(String(user.userId))
-              const isActive = activeChatId === dmId(user.userId)
+              const chatId = dmId(user.userId)
+              const isActive = activeChatId === chatId
+              const last = lastMsgMap?.[chatId]
+              const unread = unreadMap?.[chatId] || 0
+              const isLastMine = last && String(last.autorId) === String(activeUser?.id)
+              const subtitle = last
+                ? `${isLastMine ? 'Tú: ' : ''}${last.texto || ''}`
+                : ''
               return (
                 <div
                   key={user.userId}
@@ -112,26 +126,24 @@ export default function ChatSidebar({
                     isActive ? 'bg-wa-active' : 'hover:bg-wa-hover'
                   }`}
                 >
-                  <div className="relative flex-shrink-0">
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-white shadow"
-                      style={{ backgroundColor: user.color }}
-                    >
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                    <span
-                      className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ring-[3px] ring-wa-sidebar ${
-                        isOnline ? 'bg-wa-online' : 'bg-wa-muted'
-                      }`}
-                    />
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-white shadow flex-shrink-0"
+                    style={{ backgroundColor: user.color }}
+                  >
+                    {user.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[15px] text-wa-text truncate">{user.name}</p>
-                    <p className={`text-[12px] truncate ${isOnline ? 'text-wa-online' : 'text-wa-muted'}`}>
-                      {isOnline ? 'En línea' : 'Desconectado'}
-                    </p>
+                    <p className="text-[12px] text-wa-muted truncate">{subtitle}</p>
                   </div>
-                  {isActive && <span className="w-2 h-2 rounded-full bg-wa-accent flex-shrink-0" />}
+                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    {last && <span className="text-[11px] text-wa-muted">{formatListTime(last.timestamp)}</span>}
+                    {unread > 0 && (
+                      <span className="bg-wa-accent text-white text-[11px] font-semibold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center">
+                        {unread}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )
             })}
@@ -140,71 +152,6 @@ export default function ChatSidebar({
       </div>
 
       <div className="px-3 py-3 bg-wa-panel border-t border-wa-border">
-        <div className="flex items-center justify-between mb-2 px-1">
-          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-wa-muted">
-            Enviando como
-          </h2>
-          {addingUser ? (
-            <span className="text-[11px] text-wa-accent">Nuevo usuario</span>
-          ) : (
-            <span className="text-[11px] text-wa-muted">{users.length}</span>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 mb-3">
-          {users.map(user => (
-            <div
-              key={user.id}
-              onClick={() => onSwitchUser(user.id)}
-              title={user.name}
-              className={`group relative flex-shrink-0 cursor-pointer rounded-full transition ${
-                activeUserId === user.id
-                  ? 'ring-2 ring-wa-accent ring-offset-2 ring-offset-wa-panel'
-                  : 'hover:scale-105'
-              }`}
-            >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow"
-                style={{ backgroundColor: user.color }}
-              >
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-              <button
-                onClick={(e) => { e.stopPropagation(); onRemoveUser(user.id) }}
-                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-wa-danger text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition z-10"
-              >
-                <X size={10} />
-              </button>
-            </div>
-          ))}
-          {addingUser ? (
-            <div className="flex items-center gap-1.5 flex-1 min-w-0">
-              <input
-                autoFocus
-                value={newUserName}
-                onChange={e => setNewUserName(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleAddUser() }}
-                placeholder="Nombre"
-                className="flex-1 min-w-0 bg-wa-bg border border-wa-border rounded-full px-3 py-1.5 text-sm text-wa-text focus:ring-1 focus:ring-wa-accent outline-none placeholder:text-wa-muted"
-              />
-              <button onClick={handleAddUser} className="text-wa-accent hover:text-wa-text p-1 flex-shrink-0">
-                <Check size={16} />
-              </button>
-              <button onClick={() => setAddingUser(false)} className="text-wa-muted hover:text-wa-text p-1 flex-shrink-0">
-                <X size={16} />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setAddingUser(true)}
-              title="Agregar usuario simulado"
-              className="w-10 h-10 flex-shrink-0 rounded-full border border-dashed border-wa-muted/60 text-wa-muted hover:text-wa-accent hover:border-wa-accent flex items-center justify-center transition"
-            >
-              <Plus size={18} />
-            </button>
-          )}
-        </div>
-
         <button
           onClick={onLogout}
           className="w-full flex items-center justify-center gap-2 text-xs text-wa-muted hover:text-wa-text border border-wa-border hover:border-wa-muted/60 rounded-full px-3 py-2 transition"

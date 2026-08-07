@@ -1,5 +1,5 @@
 import { useEffect, useRef, useMemo } from 'react'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, Check, CheckCheck } from 'lucide-react'
 import { colorFromId } from '../utils'
 
 function sameDay(a, b) {
@@ -121,11 +121,22 @@ export default function MessageList({ messages, currentUserId }) {
                         } ${mi !== group.messages.length - 1 ? 'mb-0.5' : ''}`}
                       >
                         <p className="whitespace-pre-wrap break-words">{msg.texto}</p>
-                        <span className={`block text-right text-[10px] leading-none mt-1 ${
+                        <div className={`flex items-center justify-end gap-1 mt-1 ${
                           isMe ? 'text-white/60' : 'text-wa-muted'
                         }`}>
-                          {formatClock(msg.timestamp)}
-                        </span>
+                          <span className="text-[10px] leading-none">{formatClock(msg.timestamp)}</span>
+                          {isMe && (
+                            <span className="flex items-center">
+                              {msg.status === 'read' ? (
+                                <CheckCheck size={14} className="text-white" />
+                              ) : msg.status === 'received' ? (
+                                <Check size={14} className="text-white" />
+                              ) : (
+                                <Check size={14} className="text-white/60" />
+                              )}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -4,7 +4,6 @@ export default function Header({
   title,
   subtitle,
   color,
-  online,
   wsStatus,
   onToggleSidebar,
 }) {
@@ -27,9 +26,7 @@ export default function Header({
 
       <div className="flex-1 min-w-0">
         <h1 className="text-base font-semibold text-wa-text truncate">{title}</h1>
-        <p className={`text-xs truncate ${online ? 'text-wa-online' : 'text-wa-muted'}`}>
-          {subtitle}
-        </p>
+        <p className="text-xs text-wa-muted truncate">{subtitle}</p>
       </div>
 
       <div
