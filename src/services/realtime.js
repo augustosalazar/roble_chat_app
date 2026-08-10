@@ -2,7 +2,7 @@ const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID
 const VITE_BASE_HOST = (import.meta.env.VITE_BASE_HOST || 'http://localhost').replace(/\/$/, '')
 const VITE_REALTIME_HOST = (import.meta.env.VITE_REALTIME_HOST || `${VITE_BASE_HOST}:3003`).replace(/\/$/, '')
 
-const REALTIME_REST = `${VITE_REALTIME_HOST}/realtime/data/${VITE_PROJECT_ID}`
+const REALTIME_REST = `${VITE_REALTIME_HOST}/realtime/${VITE_PROJECT_ID}`
 
 export const GENERAL_CHAT_ID = 'general'
 

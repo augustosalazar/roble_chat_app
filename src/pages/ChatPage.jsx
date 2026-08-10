@@ -205,7 +205,7 @@ export default function ChatPage() {
     }
 
     const wsUrl = VITE_REALTIME_HOST.replace(/^http/, 'ws')
-    const socket = io(`${wsUrl}/realtime`, {
+    const socket = io(`${wsUrl}/stream`, {
       transports: ['websocket'],
       query: { token, dbName: VITE_PROJECT_ID },
     })
@@ -226,7 +226,7 @@ export default function ChatPage() {
     })
 
     socket.on('subscription_created', () => {})
-    socket.on('database_change', (payload) => {
+    socket.on('data_change', (payload) => {
       const events = Array.isArray(payload) ? payload : [payload]
       const me = activeUserIdRef.current
       for (const ev of events) {
