@@ -1,100 +1,111 @@
-const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID
-const VITE_BASE_HOST = (import.meta.env.VITE_BASE_HOST || 'http://localhost').replace(/\/$/, '')
-const VITE_REALTIME_HOST = (import.meta.env.VITE_REALTIME_HOST || `${VITE_BASE_HOST}:3003`).replace(/\/$/, '')
+const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID;
+const VITE_BASE_HOST = (
+  import.meta.env.VITE_BASE_HOST || "http://localhost"
+).replace(/\/$/, "");
+const VITE_REALTIME_HOST = (
+  import.meta.env.VITE_REALTIME_HOST || `${VITE_BASE_HOST}:3003`
+).replace(/\/$/, "");
 
-const REALTIME_REST = `${VITE_REALTIME_HOST}/realtime/${VITE_PROJECT_ID}`
+const REALTIME_REST = `${VITE_REALTIME_HOST}/realtime/${VITE_PROJECT_ID}`;
 
-export const GENERAL_CHAT_ID = 'general'
+export const GENERAL_CHAT_ID = "general";
 
 export function dmChatId(a, b) {
-  return 'dm_' + [String(a), String(b)].sort().join('_')
+  return "dm_" + [String(a), String(b)].sort().join("_");
 }
 
 async function api(method, path, body) {
-  const token = localStorage.getItem("accessToken")
+  const token = localStorage.getItem("accessToken");
   const opts = {
     method,
     headers: {
       Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-  }
-  if (body) opts.body = JSON.stringify(body)
-  const res = await fetch(`${REALTIME_REST}${path}`, opts)
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${REALTIME_REST}${path}`, opts);
   if (res.status === 401) {
-    const refreshed = await refreshAccessToken()
+    const refreshed = await refreshAccessToken();
     if (refreshed) {
-      opts.headers.Authorization = `Bearer ${localStorage.getItem("accessToken")}`
-      const retry = await fetch(`${REALTIME_REST}${path}`, opts)
-      if (!retry.ok) throw new Error(`Realtime API error ${retry.status}: ${await retry.text()}`)
-      const retryText = await retry.text()
-      return retryText ? JSON.parse(retryText) : null
+      opts.headers.Authorization = `Bearer ${localStorage.getItem("accessToken")}`;
+      const retry = await fetch(`${REALTIME_REST}${path}`, opts);
+      if (!retry.ok)
+        throw new Error(
+          `Realtime API error ${retry.status}: ${await retry.text()}`,
+        );
+      const retryText = await retry.text();
+      return retryText ? JSON.parse(retryText) : null;
     }
-    throw new Error('Sesión expirada')
+    throw new Error("Sesión expirada");
   }
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Realtime API error ${res.status}: ${text}`)
+    const text = await res.text();
+    throw new Error(`Realtime API error ${res.status}: ${text}`);
   }
-  const text = await res.text()
-  return text ? JSON.parse(text) : null
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 async function refreshAccessToken() {
-  const refreshToken = localStorage.getItem("refreshToken")
-  if (!refreshToken) return false
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) return false;
   try {
-    const res = await fetch(`${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}/refresh-token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    })
-    if (!res.ok) return false
-    const data = await res.json()
-    localStorage.setItem("accessToken", data.accessToken)
-    if (data.refreshToken) localStorage.setItem("refreshToken", data.refreshToken)
-    return true
+    const res = await fetch(
+      `${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}/refresh-token`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      },
+    );
+    if (!res.ok) return false;
+    const data = await res.json();
+    localStorage.setItem("accessToken", data.accessToken);
+    if (data.refreshToken)
+      localStorage.setItem("refreshToken", data.refreshToken);
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
 export function getChats() {
-  return api('GET', '/chats')
+  return api("GET", "/chats");
 }
 
 export function createChat(name, color) {
-  return api('POST', '/chats', {
+  return api("POST", "/chats", {
     name,
-    color: color || '#10b981',
+    color: color || "#10b981",
     createdAt: new Date().toISOString(),
-    createdBy: localStorage.getItem('userId') || 'unknown',
-  })
+    createdBy: localStorage.getItem("userId") || "unknown",
+  });
 }
 
 export function deleteChat(chatId) {
-  return api('DELETE', `/chats/${chatId}`)
+  return api("DELETE", `/chats/${chatId}`);
 }
 
 export function getMessages(chatId) {
-  return api('GET', `/messages/${chatId}`)
+  return api("GET", `/messages/${chatId}`);
 }
 
 export function pushMessage(chatId, texto, autor, color, autorId) {
-  return api('POST', `/messages/${chatId}`, {
+  return api("POST", `/messages/${chatId}`, {
     texto,
     autor,
     color,
     autorId,
     timestamp: new Date().toISOString(),
-    status: 'sent',
-  })
+    status: "sent",
+  });
 }
 
 export function updateMessage(chatId, msgId, patch) {
-  return api('PATCH', `/messages/${chatId}/${msgId}`, patch)
+  return api("PATCH", `/messages/${chatId}/${msgId}`, patch);
 }
 
 export function clearMessages(chatId) {
-  return api('PUT', `/messages/${chatId}`, {})
+  return api("PUT", `/messages/${chatId}`, {});
 }

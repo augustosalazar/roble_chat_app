@@ -274,12 +274,6 @@ export default function ChatPage() {
     return () => socket.disconnect()
   }, [scanChat, scanAllChats, isDM, addToast])
 
-  useEffect(() => {
-    if (wsStatus !== 'connected') return
-    const interval = setInterval(() => scanAllChats(), 15000)
-    return () => clearInterval(interval)
-  }, [wsStatus, scanAllChats])
-
   const participants = useMemo(() => {
     const set = new Set(messages.map(m => m.autorId).filter(Boolean))
     return set.size

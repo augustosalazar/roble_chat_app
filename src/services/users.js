@@ -1,86 +1,93 @@
-import { colorFromId } from '../utils'
+import { colorFromId } from "../utils";
 
-const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID
-const VITE_ID_CONSULTA_LISTA_USUARIOS = import.meta.env.VITE_ID_CONSULTA_LISTA_USUARIOS
-const VITE_BASE_HOST = (import.meta.env.VITE_BASE_HOST || 'http://localhost').replace(/\/$/, '')
+const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID;
+const VITE_ID_CONSULTA_LISTA_USUARIOS = import.meta.env
+  .VITE_ID_CONSULTA_LISTA_USUARIOS;
+const VITE_BASE_HOST = (
+  import.meta.env.VITE_BASE_HOST || "http://localhost"
+).replace(/\/$/, "");
 
-const DB_URL = `${VITE_BASE_HOST}/database/${VITE_PROJECT_ID}`
+const DB_URL = `${VITE_BASE_HOST}/database/${VITE_PROJECT_ID}`;
 
 export async function getSystemUsers() {
   if (!VITE_ID_CONSULTA_LISTA_USUARIOS) {
-    console.warn('[users] VITE_ID_CONSULTA_LISTA_USUARIOS no configurado')
-    return []
+    console.warn("[users] VITE_ID_CONSULTA_LISTA_USUARIOS no configurado");
+    return [];
   }
 
-  const token = localStorage.getItem('accessToken')
+  const token = localStorage.getItem("accessToken");
   let res = await fetch(`${DB_URL}/execute-query`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-      body: JSON.stringify({ id: VITE_ID_CONSULTA_LISTA_USUARIOS }),
-  })
+    body: JSON.stringify({ id: VITE_ID_CONSULTA_LISTA_USUARIOS }),
+  });
 
   if (res.status === 401) {
-    const refreshed = await refreshAccessToken()
-    if (!refreshed) throw new Error('Sesión expirada')
+    const refreshed = await refreshAccessToken();
+    if (!refreshed) throw new Error("Sesión expirada");
     res = await fetch(`${DB_URL}/execute-query`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        "Content-Type": "application/json",
       },
-    body: JSON.stringify({ id: VITE_ID_CONSULTA_LISTA_USUARIOS }),
-    })
+      body: JSON.stringify({ id: VITE_ID_CONSULTA_LISTA_USUARIOS }),
+    });
   }
 
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Error al obtener usuarios: ${res.status} ${text}`)
+    const text = await res.text();
+    throw new Error(`Error al obtener usuarios: ${res.status} ${text}`);
   }
 
-  const data = await res.json()
-  const rows = Array.isArray(data?.rows) ? data.rows : []
+  const data = await res.json();
+  const rows = Array.isArray(data?.rows) ? data.rows : [];
 
   return rows.map((row) => {
-    const id = row.user_id || row.userId || row.id
-    const name = row.name || row.email || 'Usuario'
+    const id = row.user_id || row.userId || row.id;
+    const name = row.name || row.email || "Usuario";
     return {
       id: String(id),
       userId: String(id),
       name,
-      email: row.email || '',
+      email: row.email || "",
       color: row.color || colorFromId(String(id)),
       extra: row.extra ?? null,
-    }
-  })
+    };
+  });
 }
 
 export function getCurrentUser() {
-  const id = localStorage.getItem('userId') || `user_${Date.now()}`
+  const id = localStorage.getItem("userId") || `user_${Date.now()}`;
   return {
     id,
-    name: localStorage.getItem('userName') || 'Usuario',
-    color: localStorage.getItem('userColor') || colorFromId(id),
-  }
+    name: localStorage.getItem("userName") || "Usuario",
+    color: localStorage.getItem("userColor") || colorFromId(id),
+  };
 }
 
 async function refreshAccessToken() {
-  const refreshToken = localStorage.getItem('refreshToken')
-  if (!refreshToken) return false
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) return false;
   try {
-    const res = await fetch(`${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}/refresh-token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    })
-    if (!res.ok) return false
-    const data = await res.json()
-    localStorage.setItem('accessToken', data.accessToken)
-    if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken)
-    return true
+    const res = await fetch(
+      `${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}/refresh-token`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      },
+    );
+    if (!res.ok) return false;
+    const data = await res.json();
+    localStorage.setItem("accessToken", data.accessToken);
+    if (data.refreshToken)
+      localStorage.setItem("refreshToken", data.refreshToken);
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
