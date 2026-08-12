@@ -43,9 +43,7 @@ export async function exchangeMicrosoftLogin(code) {
   return data;
 }
 
-export async function getGoogleLoginUrl() {
-  return `${AUTH_URL}/google`;
-}
+export const getGoogleLoginUrl = () => `${AUTH_URL}/google`;
 
 export function clearSession() {
   localStorage.removeItem("accessToken");
