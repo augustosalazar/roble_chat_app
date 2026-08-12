@@ -5,8 +5,17 @@ const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID;
 const VITE_BASE_HOST = (
   import.meta.env.VITE_BASE_HOST || "http://localhost"
 ).replace(/\/$/, "");
+const VITE_AUTH_HOST = (
+  import.meta.env.VITE_AUTH_HOST ||
+  import.meta.env.VITE_BASE_HOST ||
+  "http://localhost"
+).replace(/\/$/, "");
+const VITE_AUTH_PATH = (import.meta.env.VITE_AUTH_PATH ?? "/auth")
+  .replace(/^\/+/, "")
+  .replace(/\/+$/, "");
 
-export const AUTH_URL = `${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}`;
+export const AUTH_BASE = `${VITE_AUTH_HOST}/${VITE_AUTH_PATH}`.replace(/\/$/, "");
+export const AUTH_URL = `${AUTH_BASE}/${VITE_PROJECT_ID}`;
 
 export function saveSession({ accessToken, refreshToken, user, email }) {
   const userId = user?.id || user?.sub || "";
@@ -20,7 +29,7 @@ export function saveSession({ accessToken, refreshToken, user, email }) {
 
 export async function exchangeGoogleLogin(code) {
   const { data } = await axios.post(
-    `${VITE_BASE_HOST}/auth/google/exchange`,
+    `${AUTH_BASE}/auth/google/exchange`,
     { code },
   );
   return data;
@@ -28,7 +37,7 @@ export async function exchangeGoogleLogin(code) {
 
 export async function exchangeMicrosoftLogin(code) {
   const { data } = await axios.post(
-    `${VITE_BASE_HOST}/auth/microsoft/exchange`,
+    `${AUTH_BASE}/auth/microsoft/exchange`,
     { code },
   );
   return data;

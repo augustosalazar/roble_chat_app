@@ -1,4 +1,5 @@
 import { colorFromId } from "../utils";
+import { AUTH_BASE } from "./api";
 
 const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID;
 const VITE_ID_CONSULTA_LISTA_USUARIOS = import.meta.env
@@ -74,7 +75,7 @@ async function refreshAccessToken() {
   if (!refreshToken) return false;
   try {
     const res = await fetch(
-      `${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}/refresh-token`,
+      `${AUTH_BASE}/auth/${VITE_PROJECT_ID}/refresh-token`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

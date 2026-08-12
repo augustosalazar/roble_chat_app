@@ -6,6 +6,8 @@ const VITE_REALTIME_HOST = (
   import.meta.env.VITE_REALTIME_HOST || `${VITE_BASE_HOST}:3003`
 ).replace(/\/$/, "");
 
+import { AUTH_BASE } from "./api";
+
 const REALTIME_REST = `${VITE_REALTIME_HOST}/realtime/${VITE_PROJECT_ID}`;
 
 export const GENERAL_CHAT_ID = "general";
@@ -52,7 +54,7 @@ async function refreshAccessToken() {
   if (!refreshToken) return false;
   try {
     const res = await fetch(
-      `${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}/refresh-token`,
+      `${AUTH_BASE}/auth/${VITE_PROJECT_ID}/refresh-token`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
