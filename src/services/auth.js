@@ -6,6 +6,8 @@ export const register = (userData) => authAxios.post('/signup-direct', userData)
 
 export const logout = () => authAxios.post('/logout')
 
+export const getGoogleConfig = () => authAxios.get('/google-config')
+
 export const getProfile = () => authAxios.get('/profile')
 
 export const deleteAccount = () => authAxios.delete('/account')

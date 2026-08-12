@@ -1,4 +1,5 @@
 import axios from "axios";
+import { colorFromId } from "../utils";
 
 const VITE_PROJECT_ID = import.meta.env.VITE_PROJECT_ID;
 const VITE_BASE_HOST = (
@@ -6,6 +7,36 @@ const VITE_BASE_HOST = (
 ).replace(/\/$/, "");
 
 export const AUTH_URL = `${VITE_BASE_HOST}/auth/${VITE_PROJECT_ID}`;
+
+export function saveSession({ accessToken, refreshToken, user, email }) {
+  const userId = user?.id || user?.sub || "";
+  localStorage.setItem("accessToken", accessToken);
+  if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+  localStorage.setItem("rol", user?.rol || user?.role || "user");
+  localStorage.setItem("userId", userId);
+  localStorage.setItem("userName", user?.name || user?.email || email || "");
+  localStorage.setItem("userColor", colorFromId(userId));
+}
+
+export async function exchangeGoogleLogin(code) {
+  const { data } = await axios.post(
+    `${VITE_BASE_HOST}/auth/google/exchange`,
+    { code },
+  );
+  return data;
+}
+
+export async function exchangeMicrosoftLogin(code) {
+  const { data } = await axios.post(
+    `${VITE_BASE_HOST}/auth/microsoft/exchange`,
+    { code },
+  );
+  return data;
+}
+
+export async function getGoogleLoginUrl() {
+  return `${AUTH_URL}/google`;
+}
 
 export function clearSession() {
   localStorage.removeItem("accessToken");
