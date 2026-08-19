@@ -54,7 +54,7 @@ async function refreshAccessToken() {
   if (!refreshToken) return false;
   try {
     const res = await fetch(
-      `${AUTH_BASE}/auth/${VITE_PROJECT_ID}/refresh-token`,
+      `${AUTH_BASE}/${VITE_PROJECT_ID}/refresh-token`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

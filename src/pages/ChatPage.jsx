@@ -211,21 +211,68 @@ export default function ChatPage() {
     })
     socketRef.current = socket
 
-    let connectedBefore = false
+    let readyBefore = false
+    let subscriptionReady = false
+    let subscriptionPending = false
+    let subscribeRetryTimer = null
+    let disposed = false
 
-    socket.on('connect', () => {
+    const markSubscriptionReady = () => {
+      if (subscriptionReady) return
+      subscriptionReady = true
+      subscriptionPending = false
+      if (subscribeRetryTimer) clearTimeout(subscribeRetryTimer)
       setWsStatus('connected')
-      if (connectedBefore) addToast('Conexión restablecida', 'success')
-      connectedBefore = true
-      socket.emit('subscribe', {
+      if (readyBefore) addToast('Conexión restablecida', 'success')
+      readyBefore = true
+    }
+
+    const scheduleSubscription = (delay = 500) => {
+      if (disposed || subscriptionReady) return
+      if (subscribeRetryTimer) clearTimeout(subscribeRetryTimer)
+      subscribeRetryTimer = setTimeout(requestSubscription, delay)
+    }
+
+    const requestSubscription = () => {
+      if (disposed || subscriptionReady || subscriptionPending || !socket.connected) return
+      subscriptionPending = true
+      socket.timeout(1500).emit('subscribe', {
         type: 'subscribe',
         requestId: 'messages',
         table: 'messages',
         events: ['INSERT', 'UPDATE', 'DELETE'],
+      }, (err, ack) => {
+        subscriptionPending = false
+        if (disposed) return
+        if (!err && ack?.subscriptionId) {
+          markSubscriptionReady()
+          return
+        }
+        scheduleSubscription()
       })
+    }
+
+    socket.on('connect', () => {
+      subscriptionReady = false
+      subscriptionPending = false
+      setWsStatus('connecting')
+      // Fallback in case the server readiness event was emitted before this
+      // listener was attached. Failed early attempts are acknowledged/time out
+      // and retry until the subscription is actually created.
+      scheduleSubscription(250)
     })
 
-    socket.on('subscription_created', () => {})
+    socket.on('connected', requestSubscription)
+
+    socket.on('subscription_created', markSubscriptionReady)
+    socket.on('exception', (err) => {
+      console.error('[WS] Subscription error:', err)
+      subscriptionPending = false
+      scheduleSubscription()
+    })
+    socket.on('error', (err) => {
+      console.error('[WS] Server error:', err)
+    })
     socket.on('data_change', (payload) => {
       const events = Array.isArray(payload) ? payload : [payload]
       const me = activeUserIdRef.current
@@ -260,6 +307,9 @@ export default function ChatPage() {
     })
     socket.on('heartbeat', () => {})
     socket.on('disconnect', (reason) => {
+      subscriptionReady = false
+      subscriptionPending = false
+      if (subscribeRetryTimer) clearTimeout(subscribeRetryTimer)
       setWsStatus('disconnected')
       if (reason !== 'io client disconnect') {
         addToast(`Conexión perdida: ${reason}`, 'disconnected')
@@ -271,7 +321,11 @@ export default function ChatPage() {
       addToast(`WebSocket: ${err.message}`, 'error')
     })
 
-    return () => socket.disconnect()
+    return () => {
+      disposed = true
+      if (subscribeRetryTimer) clearTimeout(subscribeRetryTimer)
+      socket.disconnect()
+    }
   }, [scanChat, scanAllChats, isDM, addToast])
 
   const participants = useMemo(() => {

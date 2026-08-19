@@ -29,7 +29,7 @@ export function saveSession({ accessToken, refreshToken, user, email }) {
 
 export async function exchangeGoogleLogin(code) {
   const { data } = await axios.post(
-    `${AUTH_BASE}/auth/google/exchange`,
+    `${AUTH_BASE}/google/exchange`,
     { code },
   );
   return data;
@@ -37,7 +37,7 @@ export async function exchangeGoogleLogin(code) {
 
 export async function exchangeMicrosoftLogin(code) {
   const { data } = await axios.post(
-    `${AUTH_BASE}/auth/microsoft/exchange`,
+    `${AUTH_BASE}/microsoft/exchange`,
     { code },
   );
   return data;

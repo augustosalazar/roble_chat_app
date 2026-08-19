@@ -7,8 +7,15 @@ const VITE_ID_CONSULTA_LISTA_USUARIOS = import.meta.env
 const VITE_BASE_HOST = (
   import.meta.env.VITE_BASE_HOST || "http://localhost"
 ).replace(/\/$/, "");
+const VITE_DATABASE_HOST = (
+  import.meta.env.VITE_DATABASE_HOST || VITE_BASE_HOST
+).replace(/\/$/, "");
+const VITE_DATABASE_PATH = (import.meta.env.VITE_DATABASE_PATH ?? "/database")
+  .replace(/^\/+/, "")
+  .replace(/\/+$/, "");
 
-const DB_URL = `${VITE_BASE_HOST}/database/${VITE_PROJECT_ID}`;
+const DATABASE_BASE = `${VITE_DATABASE_HOST}/${VITE_DATABASE_PATH}`.replace(/\/$/, "");
+const DB_URL = `${DATABASE_BASE}/${VITE_PROJECT_ID}`;
 
 export async function getSystemUsers() {
   if (!VITE_ID_CONSULTA_LISTA_USUARIOS) {
@@ -75,7 +82,7 @@ async function refreshAccessToken() {
   if (!refreshToken) return false;
   try {
     const res = await fetch(
-      `${AUTH_BASE}/auth/${VITE_PROJECT_ID}/refresh-token`,
+      `${AUTH_BASE}/${VITE_PROJECT_ID}/refresh-token`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

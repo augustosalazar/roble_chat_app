@@ -24,6 +24,14 @@ Aplicación web de demostración (React + Vite) que conecta con los servicios de
 - Contrato (project) creado en Roble con los servicios de auth, base de datos y realtime habilitados.
 - Un ID de consulta (`execute-query`) que devuelva la lista de usuarios del sistema.
 
+La consulta guardada para la lista de mensajes directos usa `user_system`.
+El servicio de autenticación sincroniza allí tanto usuarios de contraseña como
+usuarios creados o vinculados mediante Google/Microsoft SSO:
+
+```sql
+SELECT * FROM user_system;
+```
+
 ## Configuración
 
 Copia el archivo `.env_sample` como `.env` y ajusta los valores:
@@ -34,9 +42,13 @@ cp .env_sample .env
 
 | Variable | Descripción |
 |---|---|
-| `VITE_BASE_HOST` | Host del servicio de autenticación y de base de datos (execute-query) de Roble. |
+| `VITE_BASE_HOST` | Host común de Roble cuando los servicios están detrás del proxy. |
+| `VITE_AUTH_HOST` | Host directo del servicio de autenticación; localmente `http://localhost:3000`. |
+| `VITE_AUTH_PATH` | Prefijo del servicio de autenticación; `/auth` con proxy y vacío localmente. |
+| `VITE_DATABASE_HOST` | Host directo del servicio de base de datos; localmente `http://localhost:3002`. |
+| `VITE_DATABASE_PATH` | Prefijo del servicio de base de datos; `/database` con proxy y vacío localmente. |
 | `VITE_PROJECT_ID` | ID del contrato (project) en Roble. |
-| `VITE_REALTIME_HOST` | Host del servicio de tiempo real de Roble. Solo lo usan las capas de proxy (dev y Docker), no el frontend. |
+| `VITE_REALTIME_HOST` | Host del servicio de tiempo real; localmente `http://localhost:3003`. |
 | `VITE_ID_CONSULTA_LISTA_USUARIOS` | ID de la consulta que trae la lista de usuarios del sistema. |
 
 ## Instalación y desarrollo
@@ -90,7 +102,7 @@ docker build -t roble-chat-demo \
 
 docker run -p 8080:80 \
   -e VITE_BASE_HOST=https://roble-api.test-openlab.uninorte.edu.co \
-  -e VITE_REALTIME_HOST=https://roble-realtime.test-openlab.uninorte.edu.co \
+  -e VITE_REALTIME_HOST=https://roble-api.test-openlab.uninorte.edu.co \
   roble-chat-demo
 ```
 
